@@ -78,6 +78,48 @@ Run the binary (optionally specifying the CPU core ID to pin execution, default 
 
 ---
 
+## Appendix: Raw Console Output
+
+To demonstrate the difference between the hardware floor and the kernel mitigation, here are the raw terminal logs from the test environments.
+
+<details>
+<summary><b>Expand Host A: Kernel Mitigation Disabled (split_lock_detect=off)</b></summary>
+
+```text
+./slbench 4
+pinned to cpu 4, tsc 2.00 GHz
+isolated  plain rmw (aligned)    samples=2000  min=         14 ns  p50=         17 ns  p99=         35 ns
+isolated  lock cas (aligned)     samples=2000  min=         18 ns  p50=         19 ns  p99=         27 ns
+isolated  lock cas (split)       samples=2000  min=      10128 ns  p50=     487601 ns  p99=     494301 ns
+saturated lock cas (aligned)     ops= 530093952  rate=   176697977 ops/s  avg=           6 ns/op
+saturated lock cas (split)       ops=      4368  rate=        1454 ops/s  avg=      687640 ns/op
+duty      1 split : 10     aligned   base=       61 ns/iter  with=      687537 ns/iter  marginal split cost=      687476 ns
+duty      1 split : 100    aligned   base=      500 ns/iter  with=      687538 ns/iter  marginal split cost=      687038 ns
+duty      1 split : 1000   aligned   base=     4814 ns/iter  with=      687531 ns/iter  marginal split cost=      682717 ns
+duty      1 split : 10000  aligned   base=    48021 ns/iter  with=      687540 ns/iter  marginal split cost=      639518 ns
+```
+</details>
+
+<details>
+<summary><b>Expand Host B: Kernel Mitigation Active (split_lock_detect=warn)</b></summary>
+
+```text
+./slbench 4
+pinned to cpu 4, tsc 2.00 GHz
+isolated  plain rmw (aligned)    samples=2000  min=         26 ns  p50=         32 ns  p99=        338 ns
+isolated  lock cas (aligned)     samples=2000  min=         29 ns  p50=         36 ns  p99=        286 ns
+isolated  lock cas (split)       samples=1981  min=       4024 ns  p50=     489448 ns  p99=   12355925 ns
+saturated lock cas (aligned)     ops= 304963856  rate=   101654586 ops/s  avg=          10 ns/op
+saturated lock cas (split)       ops=      1216  rate=         401 ops/s  avg=     2492372 ns/op
+duty      1 split : 10     aligned   base=      107 ns/iter  with=     2508642 ns/iter  marginal split cost=     2508535 ns
+duty      1 split : 100    aligned   base=      860 ns/iter  with=     2480194 ns/iter  marginal split cost=     2479334 ns
+duty      1 split : 1000   aligned   base=     8503 ns/iter  with=     2501206 ns/iter  marginal split cost=     2492703 ns
+duty      1 split : 10000  aligned   base=    83046 ns/iter  with=     2490655 ns/iter  marginal split cost=     2407609 ns
+```
+</details>
+
+---
+
 ## License
 
 This project is open-source and available under the terms of the [MIT License](LICENSE).
